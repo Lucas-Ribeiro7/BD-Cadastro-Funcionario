@@ -1,3 +1,5 @@
+--Tabelas Criadas junto com as Chaves Estrangeira
+
 --Tabela CARGO
 CREATE TABLE cadastro.tb_cargo
 (
