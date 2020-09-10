@@ -1,109 +1,107 @@
--- Criando Tabelas no schemas "cadastro"
-
---Tabela Pessoa
-CREATE TABLE cadastro.pessoa
+--Tabela CARGO
+CREATE TABLE cadastro.tb_cargo
 (
-    id_pessoa serial NOT NULL,
-    id_cidade integer,
-    id_estado_civil integer,
-    nome character varying,
-    cpf character varying,
-    cadastro time without time zone,
-    nascimento time without time zone,
-    CONSTRAINT pk_pessoa PRIMARY KEY (id_pessoa)
+isn_cargo serial NOT NULL,
+dsc_cargo character varying(250),
+flg_ativo boolean,
+CONSTRAINT tb_cargo_pkey PRIMARY KEY (isn_cargo)
 );
 
-ALTER TABLE cadastro.pessoa
-    OWNER to postgres;
-    
---Tabela Estado
-CREATE TABLE cadastro.estado
+--Tabela ESTADO CIVIL
+CREATE TABLE cadastro.tb_estado_civil
 (
-    id_estado serial NOT NULL,
-    sigla character varying(2),
-    estado character varying(250),
-    CONSTRAINT pk_estado PRIMARY KEY (id_estado)
+isn_estado_civil serial NOT NULL,
+dsc_estado_civil character varying(250),
+CONSTRAINT tb_estado_civil_pkey PRIMARY KEY (isn_estado_civil)
 );
 
-ALTER TABLE cadastro.estado
-    OWNER to postgres;
-    
---Tabela Estado Civil
-CREATE TABLE cadastro."estado civil"
+--Tabela ESTADO
+CREATE TABLE cadastro.tb_estado
 (
-    id_estado_civil serial NOT NULL,
-    estado_civil character varying(250),
-    CONSTRAINT pk_estado_civil PRIMARY KEY (id_estado_civil)
+isn_estado serial NOT NULL,
+dsc_sigla character varying(2),
+dsc_estado character varying(250),
+CONSTRAINT tb_estado_pkey PRIMARY KEY (isn_estado)
 );
 
-ALTER TABLE cadastro."estado civil"
-    OWNER to postgres;  
-    
---Tabela Cidades
-CREATE TABLE cadastro.cidades
+--Tabela CIDADE
+CREATE TABLE cadastro.tb_cidade
 (
-    id_cidade serial NOT NULL,
-    id_estado integer,
-    cidade character varying(350),
-    CONSTRAINT pk_cidade PRIMARY KEY (id_cidade)
+isn_cidade serial NOT NULL,
+isn_estado integer,
+dsc_cidade character varying(350),
+CONSTRAINT tb_cidade_pkey PRIMARY KEY (isn_cidade),
+CONSTRAINT tb_cidade_isn_estado_fkey FOREIGN KEY (isn_estado)
+REFERENCES cadastro.tb_estado (isn_estado) MATCH SIMPLE
+ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
-ALTER TABLE cadastro.cidades
-    OWNER to postgres;
-    
---Tabela Cargo
-CREATE TABLE cadastro.cargo
+--Tabela PESSOA
+create table cadastro.tb_pessoa
 (
-    id_cargo serial NOT NULL,
-    ativo boolean,
-    CONSTRAINT pk_cargo PRIMARY KEY (id_cargo)
+isn_pessoa serial NOT NULL,
+isn_cidade integer,
+isn_estado_civil integer,
+dsc_nome character varying(500),
+dsc_cpf character varying(11),
+dth_cadastro timestamp without time zone,
+dth_nascimento timestamp without time zone,
+CONSTRAINT tb_pessoa_pkey PRIMARY KEY (isn_pessoa),
+CONSTRAINT tb_pessoa_isn_cidade_fkey FOREIGN KEY (isn_cidade)
+REFERENCES cadastro.tb_cidade (isn_cidade) MATCH SIMPLE
+ON UPDATE NO ACTION ON DELETE NO ACTION,
+CONSTRAINT tb_pessoa_isn_estado_civil_fkey FOREIGN KEY (isn_estado_civil)
+REFERENCES cadastro.tb_estado_civil (isn_estado_civil) MATCH SIMPLE
+ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
-ALTER TABLE cadastro.cargo
-    OWNER to postgres;
-    
---Tabela Funcionário
-CREATE TABLE cadastro.funcionario
+--Tabela CLIENTE
+CREATE TABLE cadastro.tb_cliente
 (
-    id_funcionario serial NOT NULL,
-    id_pessoa integer,
-    id_cargo integer,
-    ativo boolean,
-    salario_base integer,
-    premiacao integer,
-    vale_transporte boolean,
-    plano_odonto integer,
-    admissao date,
-    CONSTRAINT pk_funcionario PRIMARY KEY (id_funcionario)
+isn_cliente serial NOT NULL,
+isn_pessoa integer,
+flg_ativo boolean,
+flg_autorizado boolean,
+CONSTRAINT tb_cliente_pkey PRIMARY KEY (isn_cliente),
+CONSTRAINT tb_cliente_isn_pessoa_fkey FOREIGN KEY (isn_pessoa)
+REFERENCES cadastro.tb_pessoa (isn_pessoa) MATCH SIMPLE
+ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
-ALTER TABLE cadastro.funcionario
-    OWNER to postgres;
-    
---Tabela Dependente
-CREATE TABLE cadastro.dependente
+--Tabela FUNCIONARIO
+CREATE TABLE cadastro.tb_funcionario
 (
-    id_dependente serial NOT NULL,
-    id_pessoa integer,
-    id_funcionario integer,
-    id_parentesco character varying,
-    ativo boolean,
-    CONSTRAINT pk_dependente PRIMARY KEY (id_dependente)
+isn_funcionario serial NOT NULL,
+isn_pessoa integer,
+isn_cargo integer,
+flg_ativo boolean,
+vlr_salario_base numeric(18,2),
+vlr_premiacao numeric(18,2),
+flg_vale_transporte boolean,
+vlr_plano_odonto numeric(18,2),
+dth_admissao timestamp without time zone,
+CONSTRAINT tb_funcionario_pkey PRIMARY KEY (isn_funcionario),
+CONSTRAINT tb_funcionario_isn_cargo_fkey FOREIGN KEY (isn_cargo)
+REFERENCES cadastro.tb_cargo (isn_cargo) MATCH SIMPLE
+ON UPDATE NO ACTION ON DELETE NO ACTION,
+CONSTRAINT tb_funcionario_isn_pessoa_fkey FOREIGN KEY (isn_pessoa)
+REFERENCES cadastro.tb_pessoa (isn_pessoa) MATCH SIMPLE
+ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
-ALTER TABLE cadastro.dependente
-    OWNER to postgres;
-    
---Tabela Cliente
-   CREATE TABLE cadastro.cliente
+--Tabela DEPENDENTE
+CREATE TABLE cadastro.tb_dependente
 (
-    id_cliente serial NOT NULL,
-    id_pessoa integer,
-    ativo boolean,
-    empresa character varying,
-    autorizado boolean,
-    CONSTRAINT pk_cliente PRIMARY KEY (id_cliente)
+isn_dependente serial NOT NULL,
+isn_pessoa integer,
+isn_funcionario integer,
+dsc_parentesco character varying(300),
+flg_ativo boolean,
+CONSTRAINT tb_dependente_pkey PRIMARY KEY (isn_dependente),
+CONSTRAINT tb_dependente_isn_funcionario_fkey FOREIGN KEY (isn_funcionario)
+REFERENCES cadastro.tb_funcionario (isn_funcionario) MATCH SIMPLE
+ON UPDATE NO ACTION ON DELETE NO ACTION,
+CONSTRAINT tb_dependente_isn_pessoa_fkey FOREIGN KEY (isn_pessoa)
+REFERENCES cadastro.tb_pessoa (isn_pessoa) MATCH SIMPLE
+ON UPDATE NO ACTION ON DELETE NO ACTION
 );
-
-ALTER TABLE cadastro.cliente
-    OWNER to postgres;
